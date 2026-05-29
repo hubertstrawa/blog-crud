@@ -52,45 +52,33 @@ export async function saveNewPost(
   state: PostFormState,
   formData: FormData,
 ): Promise<PostFormState> {
-  const validatedData = PostFormSchema.safeParse(
+  const validatedFields = PostFormSchema.safeParse(
     Object.fromEntries(formData.entries()),
   );
-  {
-    if (!validatedData.success) {
-      return {
-        data: Object.fromEntries(formData.entries()),
-        errors: validatedData.error.flatten().fieldErrors,
-      };
-    }
 
-    console.log({
-      thumb: validatedData.data.thumbnail,
-      thumb2: formData.get("thumbnail"),
-    });
-    let thumbnailUrl = "";
-    if (validatedData.data.thumbnail) {
-      thumbnailUrl = await uploadThumbnail(formData.get("thumbnail") as File);
-    }
-
-    const { title, content, tags, published } = validatedData.data;
-
-    const data = await authFetchGraphQL(print(CREATE_POST_MUTATION), {
-      input: { title, content, tags, published, thumbnail: thumbnailUrl },
-    });
-
-    if (data) {
-      return {
-        message: "Success! Your post has been saved.",
-        ok: true,
-      };
-    }
-
+  if (!validatedFields.success)
     return {
-      message: "Something went wrong",
-      ok: false,
       data: Object.fromEntries(formData.entries()),
+      errors: validatedFields.error.flatten().fieldErrors,
     };
-  }
+  const { thumbnail, postId, ...inputs } = validatedFields.data;
+
+  let thumbnailUrl = "";
+  if (thumbnail)
+    thumbnailUrl = await uploadThumbnail(formData.get("thumbnail") as File);
+
+  const data = await authFetchGraphQL(print(CREATE_POST_MUTATION), {
+    input: {
+      ...inputs,
+      thumbnail: thumbnailUrl,
+    },
+  });
+
+  if (data) return { message: "Success! New Post Saved", ok: true };
+  return {
+    message: "Oops, Something Went Wrong",
+    data: Object.fromEntries(formData.entries()),
+  };
 }
 
 export async function updatePost(

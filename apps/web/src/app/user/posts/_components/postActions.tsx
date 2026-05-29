@@ -1,3 +1,4 @@
+"use client";
 import {
   Tooltip,
   TooltipContent,
@@ -17,7 +18,7 @@ const PostActions = ({ postId }: Props) => {
         <Tooltip>
           <TooltipTrigger asChild>
             <Link
-              className="flex items-center justify-center size-9 rounded-full bg-gray-100 text-gray-600 hover:bg-gray-900 hover:text-white transition-colors"
+              className="border p-2 border-yellow-500 rounded-md text-yellow-500 hover:border-yellow-700  hover:text-yellow-700 transition-colors"
               href={`/user/posts/${postId}/update`}
             >
               <PencilIcon className="w-4" />
@@ -33,7 +34,7 @@ const PostActions = ({ postId }: Props) => {
         <Tooltip>
           <TooltipTrigger asChild>
             <Link
-              className="flex items-center justify-center size-9 rounded-full bg-red-50 text-red-500 hover:bg-red-500 hover:text-white transition-colors"
+              className="border p-2 border-red-500 rounded-md text-red-500 hover:border-red-700  hover:text-red-700 transition-colors"
               href={`/user/posts/${postId}/delete`}
             >
               <TrashIcon className="w-4" />
