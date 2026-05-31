@@ -36,7 +36,10 @@ const PostCard = ({
           href={`/blog/${slug}/${id}`}
         >
           Read more
-          <span aria-hidden className="transition-transform group-hover:translate-x-0.5">
+          <span
+            aria-hidden
+            className="transition-transform group-hover:translate-x-0.5"
+          >
             &rarr;
           </span>
         </Link>

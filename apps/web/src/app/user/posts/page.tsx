@@ -8,7 +8,7 @@ type Props = {
 };
 const UserPostsPage = async ({ searchParams }: Props) => {
   const { page } = await searchParams;
-  const { posts, totalPosts } = await fetchUserPosts({
+  const { totalPosts, posts } = await fetchUserPosts({
     page: page ? +page : 1,
     pageSize: DEFAULT_PAGE_SIZE,
   });

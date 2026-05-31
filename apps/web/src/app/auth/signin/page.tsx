@@ -1,7 +1,7 @@
 import Link from "next/link";
 import SignInForm from "./_components/signInForm";
 import { Button } from "@/components/ui/button";
-import { BACKEND_URL } from "@/lib/constants";
+import { PUBLIC_BACKEND_URL } from "@/lib/constants";
 
 const SignInPage = () => {
   return (
@@ -27,7 +27,7 @@ const SignInPage = () => {
         <span className="h-px flex-1 bg-gray-200" />
       </div>
       <Button variant="outline" className="w-full" asChild>
-        <a href={`${BACKEND_URL}/auth/google/login`}>Sign in with Google</a>
+        <a href={`${PUBLIC_BACKEND_URL}/auth/google/login`}>Sign in with Google</a>
       </Button>
     </div>
   );

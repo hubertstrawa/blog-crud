@@ -1,10 +1,10 @@
 import { z } from "zod";
 
 export const PostFormSchema = z.object({
-  postId: z
-    .string()
-    .transform((val) => parseInt(val))
-    .optional(),
+  postId: z.preprocess(
+    (val) => (val === "" || val === null || val === undefined ? undefined : val),
+    z.coerce.number().int().positive().optional(),
+  ),
   title: z.string().min(5).max(100),
   content: z.string().min(20),
   tags: z

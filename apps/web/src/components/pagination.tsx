@@ -24,10 +24,10 @@ const Pagination = ({
   });
 
   return (
-    <div className={cn("flex items-center justify-center gap-1.5", className)}>
+    <div className={cn("flex items-center justify-center gap-2", className)}>
       {/* pervious page button */}
       {currentPage !== 1 && (
-        <button className="flex size-9 items-center justify-center rounded-full bg-gray-100 text-gray-600 transition-colors hover:bg-gray-200">
+        <button className={cn("rounded-md bg-slate-200 py-2 px-2")}>
           <Link href={`?page=${currentPage - 1}`}>
             <ChevronLeftIcon className="w-4" />
           </Link>
@@ -37,22 +37,18 @@ const Pagination = ({
       {pageNumbers.map((page, index) => (
         <button
           key={index}
-          className={cn(
-            "flex size-9 items-center justify-center rounded-full text-sm font-medium transition-colors",
-            {
-              "bg-gray-100 text-gray-600 hover:bg-gray-200":
-                currentPage !== page && page !== "...",
-              "bg-gray-900 text-white": currentPage === page,
-              "cursor-not-allowed text-gray-400": page === "...",
-            },
-          )}
+          className={cn("px-3 py-1 rounded-md transition hover:text-sky-600", {
+            "bg-slate-200": currentPage !== page && page !== "...",
+            "bg-blue-500 text-white": currentPage === page,
+            "cursor-not-allowed": page === "...",
+          })}
         >
           {page === "..." ? "..." : <Link href={`?page=${page}`}>{page}</Link>}
         </button>
       ))}
       {/* next page button */}
       {currentPage !== totalPages && (
-        <button className="flex size-9 items-center justify-center rounded-full bg-gray-100 text-gray-600 transition-colors hover:bg-gray-200">
+        <button className="rounded-md bg-slate-200 py-2 px-2">
           <Link href={`?page=${currentPage + 1}`}>
             <ChevronRightIcon className="w-4" />
           </Link>

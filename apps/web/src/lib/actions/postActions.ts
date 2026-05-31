@@ -16,6 +16,12 @@ import { PostFormState } from "../types/formState";
 import { PostFormSchema } from "../zodSchemas/postFormSchema";
 import { uploadThumbnail } from "../upload";
 
+const getThumbnailFile = (formData: FormData) => {
+  const thumbnail = formData.get("thumbnail");
+  if (!(thumbnail instanceof File) || thumbnail.size === 0) return undefined;
+  return thumbnail;
+};
+
 export const getPosts = async ({
   page = 1,
   pageSize = 12,
@@ -52,24 +58,29 @@ export async function saveNewPost(
   state: PostFormState,
   formData: FormData,
 ): Promise<PostFormState> {
-  const validatedFields = PostFormSchema.safeParse(
-    Object.fromEntries(formData.entries()),
-  );
+  const thumbnailFile = getThumbnailFile(formData);
+  const validatedFields = PostFormSchema.safeParse({
+    ...Object.fromEntries(formData.entries()),
+    thumbnail: thumbnailFile,
+  });
 
   if (!validatedFields.success)
     return {
       data: Object.fromEntries(formData.entries()),
       errors: validatedFields.error.flatten().fieldErrors,
     };
-  const { thumbnail, postId, ...inputs } = validatedFields.data;
+  const { thumbnail, title, content, tags, published } = validatedFields.data;
 
   let thumbnailUrl = "";
-  if (thumbnail)
-    thumbnailUrl = await uploadThumbnail(formData.get("thumbnail") as File);
+  if (thumbnail && thumbnailFile)
+    thumbnailUrl = await uploadThumbnail(thumbnailFile);
 
   const data = await authFetchGraphQL(print(CREATE_POST_MUTATION), {
     input: {
-      ...inputs,
+      title,
+      content,
+      tags,
+      published,
       thumbnail: thumbnailUrl,
     },
   });
@@ -85,9 +96,11 @@ export async function updatePost(
   state: PostFormState,
   formData: FormData,
 ): Promise<PostFormState> {
-  const validatedData = PostFormSchema.safeParse(
-    Object.fromEntries(formData.entries()),
-  );
+  const thumbnailFile = getThumbnailFile(formData);
+  const validatedData = PostFormSchema.safeParse({
+    ...Object.fromEntries(formData.entries()),
+    thumbnail: thumbnailFile,
+  });
 
   if (!validatedData.success) {
     return {
@@ -101,8 +114,8 @@ export async function updatePost(
   const { thumbnail, ...inputs } = validatedData.data;
 
   let thumbnailUrl = "";
-  if (thumbnail !== undefined) {
-    thumbnailUrl = await uploadThumbnail(formData.get("thumbnail") as File);
+  if (thumbnail !== undefined && thumbnailFile) {
+    thumbnailUrl = await uploadThumbnail(thumbnailFile);
   }
 
   const data = await authFetchGraphQL(print(UPDATE_POST_MUTATION), {

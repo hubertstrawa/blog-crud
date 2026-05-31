@@ -1,0 +1,35 @@
+services:
+  api:
+    build:
+      context: .
+      dockerfile: apps/api/Dockerfile
+      target: prod
+    container_name: blog_api_prod
+    environment:
+      NODE_ENV: production
+      PORT: 8000
+      DATABASE_URL: file:/data/dev.db
+    ports:
+      - "8000:8000"
+    volumes:
+      - api_db:/data
+    restart: unless-stopped
+
+  web:
+    build:
+      context: .
+      dockerfile: apps/web/Dockerfile
+      target: prod
+    container_name: blog_web_prod
+    environment:
+      NODE_ENV: production
+      INTERNAL_BACKEND_URL: http://api:8000
+      NEXT_PUBLIC_BACKEND_URL: http://localhost:8000
+    ports:
+      - "3000:3000"
+    depends_on:
+      - api
+    restart: unless-stopped
+
+volumes:
+  api_db:
