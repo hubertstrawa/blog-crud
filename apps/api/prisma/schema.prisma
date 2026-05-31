@@ -40,6 +40,7 @@ model Post {
   comments  Comment[]
   tags Tag[] @relation("PostTags")
   likes Like[]
+  newsletterDeliveries NewsletterDelivery[]
 }
 
 model Comment {
@@ -67,4 +68,25 @@ model Like {
   post Post @relation(fields: [postId], references: [id], onDelete: Cascade)
 
   @@unique([userId, postId])
+}
+
+model NewsletterSubscriber {
+  id Int @id @default(autoincrement())
+  email String @unique
+  isActive Boolean @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  deliveries NewsletterDelivery[]
+}
+
+model NewsletterDelivery {
+  id Int @id @default(autoincrement())
+  postId Int
+  subscriberId Int
+  sentAt DateTime @default(now())
+
+  post Post @relation(fields: [postId], references: [id], onDelete: Cascade)
+  subscriber NewsletterSubscriber @relation(fields: [subscriberId], references: [id], onDelete: Cascade)
+
+  @@unique([subscriberId, postId])
 }

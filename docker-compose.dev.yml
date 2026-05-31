@@ -9,14 +9,24 @@ services:
       NODE_ENV: development
       PORT: 8000
       DATABASE_URL: file:/data/dev.db
+      RABBITMQ_URL: amqp://rabbitmq:5672
+      SMTP_HOST: mailcatcher
+      SMTP_PORT: 1025
+      SMTP_SECURE: "false"
+      NEWSLETTER_FROM: noreply@blog.local
+      NEWSLETTER_PUBLIC_BASE_URL: http://localhost:3000
       CHOKIDAR_USEPOLLING: "1"
     ports:
       - "8000:8000"
+      - "5555:5555"
     volumes:
       - .:/workspace
       - api_node_modules:/workspace/node_modules
       - api_app_node_modules:/workspace/apps/api/node_modules
       - api_db:/data
+    depends_on:
+      - rabbitmq
+      - mailcatcher
 
   web:
     build:
@@ -38,6 +48,20 @@ services:
       - web_next_cache:/workspace/apps/web/.next
     depends_on:
       - api
+
+  rabbitmq:
+    image: rabbitmq:3-management
+    container_name: blog_rabbitmq_dev
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+
+  mailcatcher:
+    image: sj26/mailcatcher
+    container_name: blog_mailcatcher_dev
+    ports:
+      - "1025:1025"
+      - "1080:1080"
 
 volumes:
   api_node_modules:

@@ -1,4 +1,5 @@
 import Hero from "@/components/hero";
+import NewsletterSection from "@/components/newsletterSection";
 import Posts from "@/components/posts";
 import { getPosts } from "@/lib/actions/postActions";
 import { DEFAULT_PAGE_SIZE } from "@/lib/constants";
@@ -26,6 +27,7 @@ export default async function Home({ searchParams }: Props) {
         currentPage={page ? +page : 1}
         totalPages={Math.ceil(totalPosts / DEFAULT_PAGE_SIZE)}
       />
+      <NewsletterSection />
     </main>
   );
 }

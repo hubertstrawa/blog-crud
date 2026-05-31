@@ -22,6 +22,7 @@ const UpsertPostForm = ({ state, formAction }: Props) => {
   return (
     <form
       action={formAction}
+      encType="multipart/form-data"
       className="flex flex-col gap-5 [&>div>label]:text-slate-500 [&>div>input]:transition [&>div>textarea]:transition"
     >
       <input hidden name="postId" defaultValue={state?.data?.postId} />

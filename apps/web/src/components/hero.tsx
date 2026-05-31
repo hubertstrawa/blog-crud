@@ -18,7 +18,7 @@ const Hero = () => {
             Welcome to
             <br />
             <span className="bg-gradient-to-r from-white to-sky-200 bg-clip-text text-transparent">
-              my blog
+              my blogg
             </span>
           </h2>
 

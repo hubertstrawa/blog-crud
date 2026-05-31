@@ -47,7 +47,7 @@ const Pagination = ({
         </button>
       ))}
       {/* next page button */}
-      {currentPage !== totalPages && (
+      {currentPage !== totalPages && totalPages > 1 && (
         <button className="rounded-md bg-slate-200 py-2 px-2">
           <Link href={`?page=${currentPage + 1}`}>
             <ChevronRightIcon className="w-4" />

@@ -6,12 +6,18 @@ export async function uploadThumbnail(image: File) {
     process.env.SUPABASE_API_KEY!,
   );
 
-  const fileName = image.name || "thumbnail";
+  const fileBuffer = await image.arrayBuffer();
+  const safeFileName = (image.name || "thumbnail")
+    .replace(/\s+/g, "-")
+    .replace(/[^a-zA-Z0-9._-]/g, "");
+  const filePath = `${Date.now()}-${safeFileName}`;
+
   const { data, error } = await supabase.storage
     .from("thumbnails")
-    .upload(`${fileName}_${Date.now()}`, image);
-
-  console.log({ data });
+    .upload(filePath, fileBuffer, {
+      contentType: image.type || "application/octet-stream",
+      upsert: false,
+    });
 
   if (error || !data) {
     throw error ?? new Error("Upload failed");

@@ -20,9 +20,9 @@ const NoPost = () => {
           href="/user/create-post"
         >
           <span>
-            <PencilSquareIcon className="w-4" />
+            <PencilSquareIcon className="w-4 text-white" />
           </span>
-          <span>Create New Post</span>
+          <span className="text-white">Create New Post</span>
         </Link>
       </Button>
     </div>

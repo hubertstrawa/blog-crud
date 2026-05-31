@@ -1,16 +1,16 @@
-import {
-  ForbiddenException,
-  Injectable,
-  UnauthorizedException,
-} from '@nestjs/common';
+import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { CreatePostInput } from './dto/create-post.input';
 import { UpdatePostInput } from './dto/update-post.input';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { DEFAULT_PAGE_SIZE } from 'src/constants';
+import { RabbitMqService } from 'src/messaging/rabbitmq.service';
 
 @Injectable()
 export class PostService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly rabbitMqService: RabbitMqService,
+  ) {}
 
   async findAll({
     skip = 0,
@@ -83,7 +83,7 @@ export class PostService {
     createPostInput: CreatePostInput;
     authorId: number;
   }) {
-    return await this.prisma.post.create({
+    const post = await this.prisma.post.create({
       data: {
         ...createPostInput,
         author: {
@@ -99,6 +99,16 @@ export class PostService {
         },
       },
     });
+
+    if (post.published) {
+      await this.rabbitMqService.publishPostPublished({
+        postId: post.id,
+        title: post.title,
+        slug: post.slug,
+      });
+    }
+
+    return post;
   }
 
   async update({
@@ -116,9 +126,14 @@ export class PostService {
       throw new UnauthorizedException('You are not the author of this post');
     }
 
-    const { postId, ...data } = updatePostInput;
+    const data = {
+      title: updatePostInput.title,
+      content: updatePostInput.content,
+      thumbnail: updatePostInput.thumbnail,
+      published: updatePostInput.published,
+    };
 
-    return await this.prisma.post.update({
+    const post = await this.prisma.post.update({
       where: { id: updatePostInput.postId },
       data: {
         ...data,
@@ -131,6 +146,18 @@ export class PostService {
         },
       },
     });
+
+    const turnedPublished =
+      updatePostInput.published === true && !authorIdMatched.published;
+    if (turnedPublished) {
+      await this.rabbitMqService.publishPostPublished({
+        postId: post.id,
+        title: post.title,
+        slug: post.slug,
+      });
+    }
+
+    return post;
   }
 
   async delete({ postId, userId }: { postId: number; userId: number }) {
